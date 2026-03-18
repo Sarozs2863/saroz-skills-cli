@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync, existsSync } from 'fs'
+import { readdirSync, readFileSync, statSync, existsSync, mkdirSync, writeFileSync } from 'fs'
 import { join, basename, relative } from 'path'
 import matter from 'gray-matter'
 import { paths } from './paths.js'
@@ -72,4 +72,28 @@ export function findSkillPath(name: string): string | null {
         }
     }
     return null
+}
+
+const VALID_NAME_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/
+
+export function isValidSkillName(name: string): boolean {
+    return VALID_NAME_RE.test(name)
+}
+
+export function listCategories(): string[] {
+    if (!existsSync(paths.skills)) return []
+    return readdirSync(paths.skills).filter(entry => {
+        const full = join(paths.skills, entry)
+        return statSync(full).isDirectory() && !existsSync(join(full, 'SKILL.md'))
+    })
+}
+
+export function createSkill(name: string, category: string): string {
+    const dir = join(paths.skills, category, name)
+    mkdirSync(dir, { recursive: true })
+
+    const skillMd = `---\nname: ${name}\ndescription: TODO\n---\n\nTODO: 描述这个 skill 的用途和使用方式\n`
+    writeFileSync(join(dir, 'SKILL.md'), skillMd)
+
+    return dir
 }
