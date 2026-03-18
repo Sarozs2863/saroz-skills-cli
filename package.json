@@ -1,9 +1,13 @@
 {
-    "name": "saroz-skills-cli",
+    "name": "@zsaro/skills-cli",
     "version": "0.1.0",
     "type": "module",
     "bin": {
         "skills": "./dist/cli.js"
+    },
+    "files": ["dist"],
+    "publishConfig": {
+        "access": "public"
     },
     "scripts": {
         "dev": "tsx src/cli.ts",
