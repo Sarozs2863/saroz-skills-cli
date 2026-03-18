@@ -12,7 +12,9 @@ import { gitClone, gitInit } from '../utils/git.js'
 export const initCommand = new Command('init')
     .description('初始化 saroz-skills')
     .argument('[repo-url]', '已有仓库的 Git URL')
-    .action(async (repoUrl?: string) => {
+    .option('-p, --profile <profile>', '指定使用的 profile（跳过交互选择）')
+    .option('--fix', '自动创建缺少的目录结构（跳过确认）')
+    .action(async (repoUrl: string | undefined, opts) => {
         // 检查是否已初始化
         if (isInitialized()) {
             console.error(kleur.red('✗ 已初始化，source 目录已存在：' + paths.source))
@@ -21,13 +23,13 @@ export const initCommand = new Command('init')
         }
 
         if (repoUrl) {
-            await initFromRepo(repoUrl)
+            await initFromRepo(repoUrl, opts)
         } else {
             initFromScratch()
         }
     })
 
-async function initFromRepo(repoUrl: string) {
+async function initFromRepo(repoUrl: string, opts: { profile?: string; fix?: boolean }) {
     // 创建辅助目录
     mkdirSync(paths.config, { recursive: true })
     mkdirSync(paths.state, { recursive: true })
@@ -51,11 +53,15 @@ async function initFromRepo(repoUrl: string) {
 
     if (!valid) {
         console.log(kleur.yellow(`⚠ 仓库缺少以下目录：${missing.join(', ')}`))
-        const shouldFix = await confirm({
-            message: '是否自动创建缺少的目录结构？',
-        })
 
-        if (shouldFix === true) {
+        const shouldFix = opts.fix ?? await (async () => {
+            const result = await confirm({
+                message: '是否自动创建缺少的目录结构？',
+            })
+            return result === true
+        })()
+
+        if (shouldFix) {
             for (const dir of missing) {
                 mkdirSync(join(paths.source, dir), { recursive: true })
             }
@@ -74,7 +80,11 @@ async function initFromRepo(repoUrl: string) {
     console.log(kleur.green('✓') + ` 校验通过 (${skillCount} skills, ${profiles.length} profiles)`)
 
     // 设置 profile
-    if (profiles.length === 1) {
+    if (opts.profile) {
+        // 非交互式
+        writeConfig({ profile: opts.profile })
+        console.log(kleur.green('✓') + ` 已设置 profile: ${kleur.bold(opts.profile)}`)
+    } else if (profiles.length === 1) {
         writeConfig({ profile: profiles[0] })
         console.log(kleur.green('✓') + ` 已设置 profile: ${kleur.bold(profiles[0])}`)
     } else if (profiles.length > 1) {
