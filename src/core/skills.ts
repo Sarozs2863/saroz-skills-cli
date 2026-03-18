@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync, existsSync, mkdirSync, writeFileSync } from 'fs'
-import { join, basename, relative } from 'path'
+import { readdirSync, readFileSync, statSync, existsSync, mkdirSync, writeFileSync, renameSync, symlinkSync, lstatSync, readlinkSync } from 'fs'
+import { join, basename, relative, resolve, dirname } from 'path'
 import matter from 'gray-matter'
 import { paths } from './paths.js'
 import type { SkillMeta } from '../types.js'
@@ -96,4 +96,38 @@ export function createSkill(name: string, category: string): string {
     writeFileSync(join(dir, 'SKILL.md'), skillMd)
 
     return dir
+}
+
+export function getSkillName(skillDir: string): string {
+    const skillMdPath = join(skillDir, 'SKILL.md')
+    try {
+        const content = readFileSync(skillMdPath, 'utf-8')
+        const { data } = matter(content)
+        return data.name ?? basename(skillDir)
+    } catch {
+        return basename(skillDir)
+    }
+}
+
+export function importSkill(sourcePath: string, category: string): { name: string; destPath: string } {
+    // 如果 sourcePath 是 symlink，解析到真实路径
+    let realPath = sourcePath
+    try {
+        if (lstatSync(sourcePath).isSymbolicLink()) {
+            realPath = resolve(dirname(sourcePath), readlinkSync(sourcePath))
+        }
+    } catch { /* use original */ }
+
+    const name = getSkillName(realPath)
+    const destPath = join(paths.skills, category, name)
+
+    mkdirSync(dirname(destPath), { recursive: true })
+
+    // 移动到仓库
+    renameSync(realPath, destPath)
+
+    // 在原位置创建 symlink 指回去
+    symlinkSync(destPath, realPath)
+
+    return { name, destPath }
 }

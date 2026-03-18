@@ -3,6 +3,7 @@ import { Command } from 'commander'
 import { initCommand } from './commands/init.js'
 import { listCommand } from './commands/list.js'
 import { addCommand } from './commands/add.js'
+import { importCommand } from './commands/import.js'
 import { installCommand } from './commands/install.js'
 
 const program = new Command()
@@ -15,6 +16,7 @@ program
 program.addCommand(initCommand)
 program.addCommand(listCommand)
 program.addCommand(addCommand)
+program.addCommand(importCommand)
 program.addCommand(installCommand)
 
 program.parse()
