@@ -7,6 +7,33 @@ export interface SkillRequires {
 export interface SkillMeta {
     name: string
     description: string
-    category: string        // 所属分类目录（如 claude-code、openclaw、common）
+    category: string
     requires?: SkillRequires
+}
+
+export interface ProfileTarget {
+    path: string
+    skills: string[]
+}
+
+export interface Profile {
+    name: string
+    description: string
+    targets: Record<string, ProfileTarget>
+}
+
+export interface Config {
+    profile: string
+}
+
+export type DeployAction = 'created' | 'skipped' | 'overwritten'
+
+export interface DeployResult {
+    targetName: string
+    targetPath: string
+    skills: Array<{
+        name: string
+        action: DeployAction
+        message?: string
+    }>
 }

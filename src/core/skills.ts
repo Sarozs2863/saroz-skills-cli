@@ -63,3 +63,13 @@ export function listSkillsByCategory(): Record<string, SkillMeta[]> {
 
     return grouped
 }
+
+export function findSkillPath(name: string): string | null {
+    const dirs = findAllSkillDirs(paths.skills)
+    for (const { path: dir } of dirs) {
+        if (basename(dir) === name) {
+            return dir
+        }
+    }
+    return null
+}
