@@ -1,14 +1,15 @@
 import { Command } from 'commander'
 import { listSkillsByCategory } from '../core/skills.js'
 import { isInitialized } from '../core/paths.js'
+import { t } from '../i18n.js'
 import kleur from 'kleur'
 
 export const listCommand = new Command('list')
-    .description('列出所有 skills')
-    .option('-v, --verbose', '显示详细信息')
+    .description(t('cmd.list.description'))
+    .option('-v, --verbose', t('cmd.list.opt.verbose'))
     .action((opts) => {
         if (!isInitialized()) {
-            console.error(kleur.red('未初始化，请先运行 skills init'))
+            console.error(kleur.red(t('common.not_initialized')))
             process.exit(1)
         }
 
@@ -16,7 +17,7 @@ export const listCommand = new Command('list')
         const total = Object.values(grouped).reduce((sum, arr) => sum + arr.length, 0)
 
         if (total === 0) {
-            console.log('暂无 skills')
+            console.log(t('cmd.list.empty'))
             return
         }
 

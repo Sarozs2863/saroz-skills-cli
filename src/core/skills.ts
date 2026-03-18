@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync, existsSync, mkdirSync, writeFileSy
 import { join, basename, relative, resolve, dirname } from 'path'
 import matter from 'gray-matter'
 import { paths } from './paths.js'
+import { t } from '../i18n.js'
 import type { SkillMeta } from '../types.js'
 
 interface SkillDir {
@@ -41,7 +42,7 @@ export function listSkills(): SkillMeta[] {
         } catch {
             skills.push({
                 name: basename(dir),
-                description: '(frontmatter 解析失败)',
+                description: t('common.frontmatter_error'),
                 category,
             })
         }

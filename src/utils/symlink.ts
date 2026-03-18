@@ -3,6 +3,7 @@ import { join, resolve } from 'path'
 import { homedir } from 'os'
 import { confirm } from '@clack/prompts'
 import { paths } from '../core/paths.js'
+import { t } from '../i18n.js'
 import type { DeployAction } from '../types.js'
 
 function expandTilde(p: string): string {
@@ -42,7 +43,7 @@ export function cleanManagedSymlinks(targetDir: string): string[] {
                 removed.push(entry)
             }
         } catch {
-            // 忽略无法读取的条目
+            // ignore
         }
     }
 
@@ -53,24 +54,20 @@ export async function createSkillSymlink(sourcePath: string, targetDir: string, 
     const dir = expandTilde(targetDir)
     const linkPath = join(dir, skillName)
 
-    // 确保目标目录存在
     mkdirSync(dir, { recursive: true })
 
-    // 目标位置无同名条目 → 创建
     if (!pathExists(linkPath)) {
         symlinkSync(sourcePath, linkPath)
         return 'created'
     }
 
-    // 有同名条目（非我方的，Step 1 已清掉我方的）→ 询问用户
-    console.log(`\n  ⚠ 冲突：${skillName}`)
-    console.log(`    目标目录已有同名 skill（非 saroz-skills 管理）`)
+    console.log(`\n  ⚠ ${t('conflict.title', { name: skillName })}`)
+    console.log(`    ${t('conflict.description')}`)
     const shouldOverwrite = await confirm({
-        message: `是否使用 saroz-skills 进行覆盖？（原文件将备份到 ~/.saroz-skills/state/backups/）`,
+        message: t('conflict.confirm'),
     })
 
     if (shouldOverwrite === true) {
-        // 备份到 state/backups/
         const backupDir = paths.backups
         mkdirSync(backupDir, { recursive: true })
         const backupPath = join(backupDir, `${skillName}-${Date.now()}`)

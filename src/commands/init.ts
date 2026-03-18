@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { select, confirm } from '@clack/prompts'
 import kleur from 'kleur'
+import { t } from '../i18n.js'
 import { paths, isInitialized } from '../core/paths.js'
 import { validateSourceRepo, listAvailableProfiles } from '../core/validator.js'
 import { writeConfig } from '../core/config.js'
@@ -10,15 +11,14 @@ import { listSkills } from '../core/skills.js'
 import { gitClone, gitInit } from '../utils/git.js'
 
 export const initCommand = new Command('init')
-    .description('初始化 saroz-skills')
-    .argument('[repo-url]', '已有仓库的 Git URL')
-    .option('-p, --profile <profile>', '指定使用的 profile（跳过交互选择）')
-    .option('--fix', '自动创建缺少的目录结构（跳过确认）')
+    .description(t('cmd.init.description'))
+    .argument('[repo-url]', t('cmd.init.arg.repo'))
+    .option('-p, --profile <profile>', t('cmd.init.opt.profile'))
+    .option('--fix', t('cmd.init.opt.fix'))
     .action(async (repoUrl: string | undefined, opts) => {
-        // 检查是否已初始化
         if (isInitialized()) {
-            console.error(kleur.red('✗ 已初始化，source 目录已存在：' + paths.source))
-            console.log(kleur.gray('ℹ 如需重新初始化，先删除 ~/.saroz-skills/ 目录'))
+            console.error(kleur.red('✗ ' + t('cmd.init.already_initialized', { path: paths.source })))
+            console.log(kleur.gray('ℹ ' + t('cmd.init.hint_reinit')))
             process.exit(1)
         }
 
@@ -30,34 +30,28 @@ export const initCommand = new Command('init')
     })
 
 async function initFromRepo(repoUrl: string, opts: { profile?: string; fix?: boolean }) {
-    // 创建辅助目录
     mkdirSync(paths.config, { recursive: true })
     mkdirSync(paths.state, { recursive: true })
 
-    // clone
-    console.log(`\nCloning ${repoUrl}...\n`)
+    console.log(`\n${t('cmd.init.cloning', { url: repoUrl })}\n`)
     try {
         gitClone(repoUrl, paths.source)
     } catch {
-        // clone 失败，清理
         const { rmSync } = await import('fs')
         rmSync(paths.home, { recursive: true, force: true })
-        console.error(kleur.red('✗ clone 失败'))
+        console.error(kleur.red('✗ ' + t('cmd.init.clone_failed')))
         process.exit(1)
     }
 
-    console.log(kleur.green('✓') + ' 已 clone 到 ' + kleur.gray(paths.source))
+    console.log(kleur.green('✓') + ' ' + t('cmd.init.cloned', { path: paths.source }))
 
-    // 校验仓库结构
     const { valid, missing } = validateSourceRepo()
 
     if (!valid) {
-        console.log(kleur.yellow(`⚠ 仓库缺少以下目录：${missing.join(', ')}`))
+        console.log(kleur.yellow('⚠ ' + t('cmd.init.missing_dirs', { dirs: missing.join(', ') })))
 
         const shouldFix = opts.fix ?? await (async () => {
-            const result = await confirm({
-                message: '是否自动创建缺少的目录结构？',
-            })
+            const result = await confirm({ message: t('cmd.init.confirm_fix') })
             return result === true
         })()
 
@@ -65,59 +59,50 @@ async function initFromRepo(repoUrl: string, opts: { profile?: string; fix?: boo
             for (const dir of missing) {
                 mkdirSync(join(paths.source, dir), { recursive: true })
             }
-            console.log(kleur.green('✓') + ` 已创建 ${missing.join(' 和 ')}`)
+            console.log(kleur.green('✓') + ' ' + t('cmd.init.dirs_created', { dirs: missing.join(', ') }))
         } else {
             const { rmSync } = await import('fs')
             rmSync(paths.home, { recursive: true, force: true })
-            console.log('已中止初始化')
+            console.log(t('cmd.init.aborted'))
             process.exit(1)
         }
     }
 
-    // 统计
     const skillCount = listSkills().length
     const profiles = listAvailableProfiles()
-    console.log(kleur.green('✓') + ` 校验通过 (${skillCount} skills, ${profiles.length} profiles)`)
+    console.log(kleur.green('✓') + ' ' + t('cmd.init.validated', { skills: skillCount, profiles: profiles.length }))
 
-    // 设置 profile
     if (opts.profile) {
-        // 非交互式
         writeConfig({ profile: opts.profile })
-        console.log(kleur.green('✓') + ` 已设置 profile: ${kleur.bold(opts.profile)}`)
+        console.log(kleur.green('✓') + ' ' + t('cmd.init.profile_set', { name: opts.profile }))
     } else if (profiles.length === 1) {
         writeConfig({ profile: profiles[0] })
-        console.log(kleur.green('✓') + ` 已设置 profile: ${kleur.bold(profiles[0])}`)
+        console.log(kleur.green('✓') + ' ' + t('cmd.init.profile_set', { name: profiles[0] }))
     } else if (profiles.length > 1) {
         const chosen = await select({
-            message: '选择要使用的 profile：',
+            message: t('cmd.init.select_profile'),
             options: profiles.map(p => ({ label: p, value: p })),
         })
 
         if (typeof chosen === 'string') {
             writeConfig({ profile: chosen })
-            console.log(kleur.green('✓') + ` 已设置 profile: ${kleur.bold(chosen)}`)
+            console.log(kleur.green('✓') + ' ' + t('cmd.init.profile_set', { name: chosen }))
         }
     } else {
-        console.log(kleur.gray('ℹ 暂无 profile，使用 skills profile create <name> 创建'))
+        console.log(kleur.gray('ℹ ' + t('cmd.init.no_profiles')))
     }
 }
 
 function initFromScratch() {
-    // 创建完整骨架
     mkdirSync(join(paths.source, 'skills'), { recursive: true })
     mkdirSync(join(paths.source, 'profiles'), { recursive: true })
     mkdirSync(paths.config, { recursive: true })
     mkdirSync(paths.state, { recursive: true })
 
-    // README
-    writeFileSync(join(paths.source, 'README.md'), '# saroz-skills\n\nAI Skills 统一管理仓库。\n')
-
-    // 默认 config
+    writeFileSync(join(paths.source, 'README.md'), '# saroz-skills\n\nAI Skills management repo.\n')
     writeConfig({ profile: 'default' })
-
-    // git init
     gitInit(paths.source)
 
-    console.log(kleur.green('\n✓') + ' 空仓库已创建于 ' + kleur.gray(paths.source))
-    console.log(kleur.gray('ℹ 使用 skills add <name> 添加第一个 skill'))
+    console.log(kleur.green('\n✓') + ' ' + t('cmd.init.scratch_done', { path: paths.source }))
+    console.log(kleur.gray('ℹ ' + t('cmd.init.scratch_hint')))
 }

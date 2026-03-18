@@ -2,6 +2,7 @@ import { currentProfile } from './config.js'
 import { getProfile } from './profiles.js'
 import { findSkillPath } from './skills.js'
 import { cleanManagedSymlinks, createSkillSymlink } from '../utils/symlink.js'
+import { t } from '../i18n.js'
 import type { DeployResult } from '../types.js'
 
 export async function deploy(dryRun = false): Promise<DeployResult[]> {
@@ -29,7 +30,7 @@ export async function deploy(dryRun = false): Promise<DeployResult[]> {
                 result.skills.push({
                     name: skillName,
                     action: 'skipped',
-                    message: 'skill 在仓库中不存在',
+                    message: t('cmd.install.skill_not_found'),
                 })
                 continue
             }

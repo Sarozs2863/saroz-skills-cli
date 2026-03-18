@@ -2,20 +2,21 @@ import { Command } from 'commander'
 import { deploy } from '../core/deployer.js'
 import { currentProfile } from '../core/config.js'
 import { isInitialized } from '../core/paths.js'
+import { t } from '../i18n.js'
 import kleur from 'kleur'
 
 export const installCommand = new Command('install')
-    .description('按当前 profile 同步部署 skills')
-    .option('--dry-run', '预览，不实际执行')
+    .description(t('cmd.install.description'))
+    .option('--dry-run', t('cmd.install.opt.dry_run'))
     .action(async (opts) => {
         if (!isInitialized()) {
-            console.error(kleur.red('未初始化，请先运行 skills init'))
+            console.error(kleur.red(t('common.not_initialized')))
             process.exit(1)
         }
 
         const profileName = currentProfile()
         const prefix = opts.dryRun ? kleur.yellow('[dry-run] ') : ''
-        console.log(`\n${prefix}Syncing profile: ${kleur.bold(profileName)}\n`)
+        console.log(`\n${prefix}${t('cmd.install.syncing', { name: profileName })}\n`)
 
         const results = await deploy(opts.dryRun)
 
@@ -51,5 +52,5 @@ export const installCommand = new Command('install')
         if (totalOverwritten) parts.push(`overwritten: ${totalOverwritten}`)
         if (totalSkipped) parts.push(`skipped: ${totalSkipped}`)
 
-        console.log(`${prefix}${kleur.green('✓')} Done: ${parts.join(', ')}`)
+        console.log(`${prefix}${kleur.green('✓')} ${t('cmd.install.done', { summary: parts.join(', ') })}`)
     })

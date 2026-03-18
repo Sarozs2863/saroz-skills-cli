@@ -1,19 +1,20 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { profilePath } from './paths.js'
+import { t } from '../i18n.js'
 import type { Profile } from '../types.js'
 
 export function getProfile(name: string): Profile {
     const filePath = profilePath(name)
 
     if (!existsSync(filePath)) {
-        throw new Error(`Profile 不存在：${name}（${filePath}）`)
+        throw new Error(t('common.profile_not_found', { name, path: filePath }))
     }
 
     try {
         const content = readFileSync(filePath, 'utf-8')
         return JSON.parse(content)
     } catch {
-        throw new Error(`Profile 格式错误：${filePath}`)
+        throw new Error(t('common.profile_format_error', { path: filePath }))
     }
 }
 
@@ -23,7 +24,7 @@ export function addSkillToProfile(profileName: string, targetNames: string[], sk
     for (const targetName of targetNames) {
         const target = profile.targets[targetName]
         if (!target) {
-            throw new Error(`Target 不存在：${targetName}（profile: ${profileName}）`)
+            throw new Error(t('common.target_not_found', { name: targetName, profile: profileName }))
         }
         if (!target.skills.includes(skillName)) {
             target.skills.push(skillName)

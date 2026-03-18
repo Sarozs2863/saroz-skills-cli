@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
+import { t, setLocale } from './i18n.js'
 import { initCommand } from './commands/init.js'
 import { listCommand } from './commands/list.js'
 import { addCommand } from './commands/add.js'
@@ -10,8 +11,13 @@ const program = new Command()
 
 program
     .name('skills')
-    .description('AI Skills 管理工具')
+    .description(t('cli.description'))
     .version('0.1.0')
+    .option('--lang <locale>', 'Set language (en/zh)')
+    .hook('preAction', (thisCommand) => {
+        const opts = thisCommand.opts()
+        if (opts.lang) setLocale(opts.lang)
+    })
 
 program.addCommand(initCommand)
 program.addCommand(listCommand)
