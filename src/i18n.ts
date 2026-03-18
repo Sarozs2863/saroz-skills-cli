@@ -1,6 +1,7 @@
-import { readFileSync } from 'fs'
+import { createRequire } from 'module'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { existsSync, readFileSync } from 'fs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -8,9 +9,24 @@ type Messages = Record<string, string>
 
 const locales: Record<string, Messages> = {}
 
+// 尝试多个路径，兼容开发模式和打包后
+function loadLocale(lang: string): Messages {
+    const candidates = [
+        join(__dirname, `locales/${lang}.json`),         // dev: src/locales/
+        join(__dirname, `../src/locales/${lang}.json`),   // dist: ../src/locales/
+    ]
+
+    for (const p of candidates) {
+        if (existsSync(p)) {
+            return JSON.parse(readFileSync(p, 'utf-8'))
+        }
+    }
+
+    return {}
+}
+
 for (const lang of ['en', 'zh']) {
-    const filePath = join(__dirname, `locales/${lang}.json`)
-    locales[lang] = JSON.parse(readFileSync(filePath, 'utf-8'))
+    locales[lang] = loadLocale(lang)
 }
 
 function getSystemLocale(): string {

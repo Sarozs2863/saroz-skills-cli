@@ -12,7 +12,7 @@ const program = new Command()
 program
     .name('skills')
     .description(t('cli.description'))
-    .version('0.1.0')
+    .version('0.2.0')
     .option('--lang <locale>', 'Set language (en/zh)')
     .hook('preAction', (thisCommand) => {
         const opts = thisCommand.opts()
