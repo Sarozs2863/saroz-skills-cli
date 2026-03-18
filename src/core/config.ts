@@ -1,4 +1,5 @@
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
+import { dirname } from 'path'
 import { paths } from './paths.js'
 import type { Config } from '../types.js'
 
@@ -17,6 +18,13 @@ export function readConfig(): Config {
     } catch {
         throw new Error(`配置文件格式错误：${paths.configFile}`)
     }
+}
+
+export function writeConfig(partial: Partial<Config>): void {
+    const current = existsSync(paths.configFile) ? readConfig() : DEFAULT_CONFIG
+    const merged = { ...current, ...partial }
+    mkdirSync(dirname(paths.configFile), { recursive: true })
+    writeFileSync(paths.configFile, JSON.stringify(merged, null, 4) + '\n')
 }
 
 export function currentProfile(): string {
