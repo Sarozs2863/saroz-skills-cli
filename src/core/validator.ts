@@ -3,15 +3,9 @@ import { join } from 'path'
 import { paths } from './paths.js'
 
 export function validateSourceRepo(): { valid: boolean; missing: string[] } {
-    const required = ['skills', 'profiles']
     const missing: string[] = []
-
-    for (const dir of required) {
-        if (!existsSync(join(paths.source, dir))) {
-            missing.push(dir)
-        }
-    }
-
+    if (!existsSync(paths.skills)) missing.push('skills')
+    if (!existsSync(paths.profiles)) missing.push('skills-profiles')
     return { valid: missing.length === 0, missing }
 }
 
