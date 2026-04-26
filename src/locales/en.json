@@ -58,6 +58,13 @@
     "cmd.install.done": "Done: {summary}",
     "cmd.install.skill_not_found": "Skill not found in repo",
 
+    "cmd.env.description": "Read environment values required by skills",
+    "cmd.env.get.description": "Return all env declared by a skill",
+    "cmd.env.get.arg.skill": "Skill name",
+    "cmd.env.skill_not_found": "Skill not found: {name}",
+    "cmd.env.missing_required": "{skill} is missing required env: {keys}",
+    "cmd.env.failed": "Failed to read env: {message}",
+
     "conflict.title": "Conflict: {name}",
     "conflict.description": "Target directory has a skill with the same name (not managed by saroz-skills)",
     "conflict.confirm": "Overwrite with saroz-skills? (original backed up to ~/.saroz-skills/state/backups/)",

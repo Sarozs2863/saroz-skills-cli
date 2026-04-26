@@ -55,6 +55,9 @@ skills add my-new-skill
 
 # 部署到目标平台
 skills install
+
+# 读取某个 skill 声明需要的环境变量
+skills env get my-skill
 ```
 
 ## 命令
@@ -126,6 +129,18 @@ skills install --dry-run  # 预览，不实际执行
 2. **部署** — 按 profile 声明创建新 symlink
 3. **冲突** — 遇到同名非本仓库 skill 时询问用户
 
+### `skills env get <skill-name>`
+
+返回指定 skill 在当前 profile 下声明需要的全部 env。成功时 stdout 只输出 JSON，便于 agent 直接解析。
+
+```bash
+skills env get obsidian-vault
+```
+
+如果 skill 缺少必需变量，命令返回非 0，并在 stderr 中列出缺失 key。
+
+profile env 中可以使用 `~` 或 `~/...` 表示用户 home；命令输出时会展开为绝对路径。
+
 ## Profile 配置
 
 Profile 定义「哪些 skills 部署到哪个平台目录」。
@@ -134,6 +149,12 @@ Profile 定义「哪些 skills 部署到哪个平台目录」。
 {
     "name": "personal",
     "description": "个人 Mac 开发环境",
+    "env": {
+        "folders": {
+            "vault": "/Users/me/vault",
+            "skills": "~/.saroz-skills/source"
+        }
+    },
     "targets": {
         "claude-code": {
             "path": "~/.claude/skills",
@@ -154,10 +175,32 @@ Skills 可跨 target 共享——`skills-meta` 同时出现在 Claude Code 和 O
 ```
 skill-name/
 ├── SKILL.md          # 必须：frontmatter + 指令内容
+├── env.schema.json   # 可选：声明该 skill 需要的 profile env
+├── env.defaults.json # 可选：该 skill 的默认 env
 ├── references/       # 可选：参考数据
 ├── scripts/          # 可选：脚本文件
 └── sub-skills/       # 可选：子 skills
 ```
+
+### env.schema.json
+
+```json
+{
+    "vars": {
+        "folders.vault": {
+            "required": true,
+            "description": "主 vault 路径"
+        },
+        "folders.skills": {
+            "required": false,
+            "description": "saroz-skills 仓库路径"
+        }
+    }
+}
+```
+
+`skills env get <skill-name>` 只返回 schema 中声明的变量，不会暴露整个 profile env。
+profile env 里以 `~` 或 `~/` 开头的字符串会在输出时展开成绝对路径。
 
 ### SKILL.md Frontmatter
 

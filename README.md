@@ -55,6 +55,9 @@ skills add my-new-skill
 
 # Deploy skills to target platforms
 skills install
+
+# Read env values declared by a skill
+skills env get my-skill
 ```
 
 ## Commands
@@ -126,6 +129,18 @@ The install process:
 2. **Deploy** — Create symlinks for skills listed in the current profile
 3. **Conflict** — If a non-managed skill has the same name, ask the user
 
+### `skills env get <skill-name>`
+
+Return all env values declared by a skill for the current profile. On success, stdout contains JSON only so agents can parse it directly.
+
+```bash
+skills env get obsidian-vault
+```
+
+If a required env value is missing, the command exits non-zero and prints the missing keys to stderr.
+
+Profile env values may use `~` or `~/...` for the user home. The command expands them to absolute paths in its JSON output.
+
 ## Profile
 
 A profile defines which skills go to which platform directory.
@@ -134,6 +149,12 @@ A profile defines which skills go to which platform directory.
 {
     "name": "personal",
     "description": "Personal Mac setup",
+    "env": {
+        "folders": {
+            "vault": "/Users/me/vault",
+            "skills": "~/.saroz-skills/source"
+        }
+    },
     "targets": {
         "claude-code": {
             "path": "~/.claude/skills",
@@ -154,10 +175,32 @@ Skills can be shared across targets — `skills-meta` appears in both Claude Cod
 ```
 skill-name/
 ├── SKILL.md          # Required: frontmatter + instructions
+├── env.schema.json   # Optional: profile env required by this skill
+├── env.defaults.json # Optional: default env values for this skill
 ├── references/       # Optional: supporting data
 ├── scripts/          # Optional: executable scripts
 └── sub-skills/       # Optional: nested skills
 ```
+
+### env.schema.json
+
+```json
+{
+    "vars": {
+        "folders.vault": {
+            "required": true,
+            "description": "Main vault path"
+        },
+        "folders.skills": {
+            "required": false,
+            "description": "saroz-skills repo path"
+        }
+    }
+}
+```
+
+`skills env get <skill-name>` returns only variables declared by that schema. It does not expose the full profile env.
+Strings starting with `~` or `~/` in profile env are expanded to absolute paths in the command output.
 
 ### SKILL.md Frontmatter
 

@@ -58,6 +58,13 @@
     "cmd.install.done": "完成：{summary}",
     "cmd.install.skill_not_found": "skill 在仓库中不存在",
 
+    "cmd.env.description": "读取 skill 所需的环境变量",
+    "cmd.env.get.description": "返回指定 skill 声明的全部 env",
+    "cmd.env.get.arg.skill": "skill 名称",
+    "cmd.env.skill_not_found": "skill 不存在：{name}",
+    "cmd.env.missing_required": "{skill} 缺少必需 env：{keys}",
+    "cmd.env.failed": "读取 env 失败：{message}",
+
     "conflict.title": "冲突：{name}",
     "conflict.description": "目标目录已有同名 skill（非 saroz-skills 管理）",
     "conflict.confirm": "是否使用 saroz-skills 进行覆盖？（原文件将备份到 ~/.saroz-skills/state/backups/）",

@@ -20,6 +20,7 @@ export interface Profile {
     name: string
     description: string
     targets: Record<string, ProfileTarget>
+    env?: Record<string, unknown>
 }
 
 export interface Config {
