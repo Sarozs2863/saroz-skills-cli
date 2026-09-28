@@ -17,9 +17,9 @@
     "cmd.init.validated": "Validated ({skills} skills, {profiles} profiles)",
     "cmd.init.profile_set": "Profile set to: {name}",
     "cmd.init.select_profile": "Select profile:",
-    "cmd.init.no_profiles": "No profiles found, use skills profile create <name> to create one",
+    "cmd.init.no_profiles": "No profiles found, use saroz-skills profile create <name> to create one",
     "cmd.init.scratch_done": "Empty repo created at {path}",
-    "cmd.init.scratch_hint": "Use skills add <name> to add your first skill",
+    "cmd.init.scratch_hint": "Use saroz-skills add <name> to add your first skill",
 
     "cmd.list.description": "List all skills",
     "cmd.list.opt.verbose": "Show detailed descriptions",
@@ -69,7 +69,7 @@
     "conflict.description": "Target directory has a skill with the same name (not managed by saroz-skills)",
     "conflict.confirm": "Overwrite with saroz-skills? (original backed up to ~/.saroz-skills/state/backups/)",
 
-    "common.not_initialized": "Not initialized, run skills init first",
+    "common.not_initialized": "Not initialized, run saroz-skills init first",
     "common.frontmatter_error": "(frontmatter parse error)",
     "common.config_error": "Config file format error: {path}",
     "common.profile_not_found": "Profile not found: {name} ({path})",

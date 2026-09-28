@@ -38,90 +38,92 @@ Skills are deployed via **symlinks** — edit once, effective everywhere. No cop
 npm install -g @zsaro/skills-cli
 ```
 
+The command is `saroz-skills`. It was renamed from `skills` in 0.3.0 to avoid clashing with the `skills` package from vercel-labs (`npx skills`).
+
 ## Quick Start
 
 ```bash
 # Initialize from existing repo
-skills init https://github.com/your-user/your-skills.git
+saroz-skills init https://github.com/your-user/your-skills.git
 
 # Or start fresh
-skills init
+saroz-skills init
 
 # List all skills
-skills list
+saroz-skills list
 
 # Add a new skill
-skills add my-new-skill
+saroz-skills add my-new-skill
 
 # Deploy skills to target platforms
-skills install
+saroz-skills install
 
 # Read env values declared by a skill
-skills env get my-skill
+saroz-skills env get my-skill
 ```
 
 ## Commands
 
-### `skills init [repo-url]`
+### `saroz-skills init [repo-url]`
 
 Initialize the skills workspace.
 
 ```bash
 # Clone existing skills repo
-skills init https://github.com/user/skills.git
+saroz-skills init https://github.com/user/skills.git
 
 # Clone with specific profile (non-interactive)
-skills init https://github.com/user/skills.git --profile personal
+saroz-skills init https://github.com/user/skills.git --profile personal
 
 # Create empty workspace from scratch
-skills init
+saroz-skills init
 ```
 
-### `skills list`
+### `saroz-skills list`
 
 List all available skills grouped by category.
 
 ```bash
-skills list           # Names only
-skills list -v        # With descriptions
+saroz-skills list           # Names only
+saroz-skills list -v        # With descriptions
 ```
 
-### `skills add <name>`
+### `saroz-skills add <name>`
 
 Create a new skill with scaffold.
 
 ```bash
 # Interactive
-skills add my-skill
+saroz-skills add my-skill
 
 # Non-interactive
-skills add my-skill --category claude-code --target claude-code --target openclaw
+saroz-skills add my-skill --category claude-code --target claude-code --target openclaw
 
 # Create without adding to profile
-skills add my-skill --category common --no-profile
+saroz-skills add my-skill --category common --no-profile
 ```
 
-### `skills import <path>`
+### `saroz-skills import <path>`
 
 Import an existing skill from an external directory.
 
 ```bash
 # Interactive
-skills import ~/.claude/skills/some-skill
+saroz-skills import ~/.claude/skills/some-skill
 
 # Non-interactive
-skills import ~/.claude/skills/some-skill --category claude-code --target claude-code
+saroz-skills import ~/.claude/skills/some-skill --category claude-code --target claude-code
 ```
 
 The original directory is replaced with a symlink pointing back to the repository, so existing tools continue to work.
 
-### `skills install`
+### `saroz-skills install`
 
 Sync deploy skills according to the current profile.
 
 ```bash
-skills install            # Deploy via symlinks
-skills install --dry-run  # Preview without changes
+saroz-skills install            # Deploy via symlinks
+saroz-skills install --dry-run  # Preview without changes
 ```
 
 The install process:
@@ -129,12 +131,12 @@ The install process:
 2. **Deploy** — Create symlinks for skills listed in the current profile
 3. **Conflict** — If a non-managed skill has the same name, ask the user
 
-### `skills env get <skill-name>`
+### `saroz-skills env get <skill-name>`
 
 Return all env values declared by a skill for the current profile. On success, stdout contains JSON only so agents can parse it directly.
 
 ```bash
-skills env get obsidian-vault
+saroz-skills env get obsidian-vault
 ```
 
 If a required env value is missing, the command exits non-zero and prints the missing keys to stderr.
@@ -199,7 +201,7 @@ skill-name/
 }
 ```
 
-`skills env get <skill-name>` returns only variables declared by that schema. It does not expose the full profile env.
+`saroz-skills env get <skill-name>` returns only variables declared by that schema. It does not expose the full profile env.
 Strings starting with `~` or `~/` in profile env are expanded to absolute paths in the command output.
 
 ### SKILL.md Frontmatter
@@ -218,7 +220,7 @@ requires:
 ## Design Principles
 
 - **Single Source of Truth** — One repo, symlinks everywhere
-- **Idempotent** — Run `skills install` anytime, safe to repeat
+- **Idempotent** — Run `saroz-skills install` anytime, safe to repeat
 - **Non-destructive** — Conflicts prompt user, backups before overwrite
 - **Platform agnostic** — Works with any tool that reads skills from a directory
 

@@ -11,9 +11,9 @@ import { envCommand } from './commands/env.js'
 const program = new Command()
 
 program
-    .name('skills')
+    .name('saroz-skills')
     .description(t('cli.description'))
-    .version('0.2.1')
+    .version('0.3.0')
     .option('--lang <locale>', 'Set language (en/zh)')
     .hook('preAction', (thisCommand) => {
         const opts = thisCommand.opts()

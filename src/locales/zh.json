@@ -17,9 +17,9 @@
     "cmd.init.validated": "校验通过 ({skills} skills, {profiles} profiles)",
     "cmd.init.profile_set": "已设置 profile: {name}",
     "cmd.init.select_profile": "选择要使用的 profile：",
-    "cmd.init.no_profiles": "暂无 profile，使用 skills profile create <name> 创建",
+    "cmd.init.no_profiles": "暂无 profile，使用 saroz-skills profile create <name> 创建",
     "cmd.init.scratch_done": "空仓库已创建于 {path}",
-    "cmd.init.scratch_hint": "使用 skills add <name> 添加第一个 skill",
+    "cmd.init.scratch_hint": "使用 saroz-skills add <name> 添加第一个 skill",
 
     "cmd.list.description": "列出所有 skills",
     "cmd.list.opt.verbose": "显示详细信息",
@@ -69,7 +69,7 @@
     "conflict.description": "目标目录已有同名 skill（非 saroz-skills 管理）",
     "conflict.confirm": "是否使用 saroz-skills 进行覆盖？（原文件将备份到 ~/.saroz-skills/state/backups/）",
 
-    "common.not_initialized": "未初始化，请先运行 skills init",
+    "common.not_initialized": "未初始化，请先运行 saroz-skills init",
     "common.frontmatter_error": "(frontmatter 解析失败)",
     "common.config_error": "配置文件格式错误：{path}",
     "common.profile_not_found": "Profile 不存在：{name}（{path}）",

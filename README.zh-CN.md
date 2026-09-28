@@ -38,90 +38,92 @@ Skills 通过 **symlink** 部署——改一处，所有引用即时生效。无
 npm install -g @zsaro/skills-cli
 ```
 
+命令名为 `saroz-skills`。0.3.0 起由 `skills` 改名，避免与 vercel-labs 的 `skills` 包（`npx skills`）重名。
+
 ## 快速开始
 
 ```bash
 # 从已有仓库初始化
-skills init https://github.com/your-user/your-skills.git
+saroz-skills init https://github.com/your-user/your-skills.git
 
 # 或从零开始
-skills init
+saroz-skills init
 
 # 列出所有 skills
-skills list
+saroz-skills list
 
 # 添加新 skill
-skills add my-new-skill
+saroz-skills add my-new-skill
 
 # 部署到目标平台
-skills install
+saroz-skills install
 
 # 读取某个 skill 声明需要的环境变量
-skills env get my-skill
+saroz-skills env get my-skill
 ```
 
 ## 命令
 
-### `skills init [repo-url]`
+### `saroz-skills init [repo-url]`
 
 初始化 skills 工作空间。
 
 ```bash
 # clone 已有仓库
-skills init https://github.com/user/skills.git
+saroz-skills init https://github.com/user/skills.git
 
 # 指定 profile（非交互式）
-skills init https://github.com/user/skills.git --profile personal
+saroz-skills init https://github.com/user/skills.git --profile personal
 
 # 从零创建
-skills init
+saroz-skills init
 ```
 
-### `skills list`
+### `saroz-skills list`
 
 按分类列出所有 skills。
 
 ```bash
-skills list           # 只显示名称
-skills list -v        # 显示详细描述
+saroz-skills list           # 只显示名称
+saroz-skills list -v        # 显示详细描述
 ```
 
-### `skills add <name>`
+### `saroz-skills add <name>`
 
 创建新 skill 骨架。
 
 ```bash
 # 交互式
-skills add my-skill
+saroz-skills add my-skill
 
 # 非交互式
-skills add my-skill --category claude-code --target claude-code --target openclaw
+saroz-skills add my-skill --category claude-code --target claude-code --target openclaw
 
 # 只创建不加入 profile
-skills add my-skill --category common --no-profile
+saroz-skills add my-skill --category common --no-profile
 ```
 
-### `skills import <path>`
+### `saroz-skills import <path>`
 
 从外部目录导入已有 skill。
 
 ```bash
 # 交互式
-skills import ~/.claude/skills/some-skill
+saroz-skills import ~/.claude/skills/some-skill
 
 # 非交互式
-skills import ~/.claude/skills/some-skill --category claude-code --target claude-code
+saroz-skills import ~/.claude/skills/some-skill --category claude-code --target claude-code
 ```
 
 导入后原目录变为 symlink 指向仓库，现有工具继续正常工作。
 
-### `skills install`
+### `saroz-skills install`
 
 按当前 profile 同步部署 skills。
 
 ```bash
-skills install            # 部署
-skills install --dry-run  # 预览，不实际执行
+saroz-skills install            # 部署
+saroz-skills install --dry-run  # 预览，不实际执行
 ```
 
 部署过程：
@@ -129,12 +131,12 @@ skills install --dry-run  # 预览，不实际执行
 2. **部署** — 按 profile 声明创建新 symlink
 3. **冲突** — 遇到同名非本仓库 skill 时询问用户
 
-### `skills env get <skill-name>`
+### `saroz-skills env get <skill-name>`
 
 返回指定 skill 在当前 profile 下声明需要的全部 env。成功时 stdout 只输出 JSON，便于 agent 直接解析。
 
 ```bash
-skills env get obsidian-vault
+saroz-skills env get obsidian-vault
 ```
 
 如果 skill 缺少必需变量，命令返回非 0，并在 stderr 中列出缺失 key。
@@ -199,7 +201,7 @@ skill-name/
 }
 ```
 
-`skills env get <skill-name>` 只返回 schema 中声明的变量，不会暴露整个 profile env。
+`saroz-skills env get <skill-name>` 只返回 schema 中声明的变量，不会暴露整个 profile env。
 profile env 里以 `~` 或 `~/` 开头的字符串会在输出时展开成绝对路径。
 
 ### SKILL.md Frontmatter
@@ -218,7 +220,7 @@ requires:
 ## 设计原则
 
 - **单一事实来源** — 一个仓库，symlink 分发
-- **幂等** — `skills install` 随时可重复执行
+- **幂等** — `saroz-skills install` 随时可重复执行
 - **非破坏性** — 冲突时询问用户，覆盖前自动备份
 - **平台无关** — 适用于任何从目录读取 skills 的工具
 
